@@ -430,7 +430,19 @@ fn detect_shells_for_os(git_env: &HydratedGitEnv, default_cwd: &HostPath) -> Vec
 
     #[cfg(windows)]
     {
-        let _ = git_env;
+        // Only offer shells that actually exist: the first profile is spawned by default, and
+        // PowerShell 7 (`pwsh.exe`) / WSL are optional installs. `cmd.exe` always ships with
+        // Windows, so it is kept even if `PATH` lookup fails.
+        let path_var = git_env
+            .get("PATH")
+            .or_else(|| git_env.get("Path"))
+            .map(std::ffi::OsStr::to_os_string)
+            .or_else(|| std::env::var_os("PATH"));
+        let on_path = |prog: &str| {
+            path_var.as_ref().is_some_and(|paths| {
+                std::env::split_paths(paths).any(|dir| dir.join(prog).is_file())
+            })
+        };
         for (label, prog, args) in [
             ("PowerShell 7", "pwsh.exe", vec!["-NoLogo".to_string()]),
             (
@@ -441,7 +453,7 @@ fn detect_shells_for_os(git_env: &HydratedGitEnv, default_cwd: &HostPath) -> Vec
             ("Command Prompt", "cmd.exe", Vec::new()),
             ("WSL", "wsl.exe", Vec::new()),
         ] {
-            if seen.insert(prog.to_string()) {
+            if (prog == "cmd.exe" || on_path(prog)) && seen.insert(prog.to_string()) {
                 profiles.push(ShellProfile {
                     label: CompactString::from(label),
                     program: prog.to_string(),

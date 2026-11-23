@@ -9,11 +9,15 @@ use branvio_core::ids::RepoId;
 use branvio_core::paths::HostPath;
 use branvio_core::pipeline::{DirtyScopeFlags, InternalOpController};
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
-use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::event::{AccessKind, AccessMode};
+use notify::{Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 use tokio::sync::{mpsc, oneshot};
 use tokio::time::Instant;
+
+/// Maximum queued raw events ingested in one wake-up before yielding back to the executor.
+const MAX_COALESCE_BATCH: usize = 1024;
 
 struct NotifyWatchHandle {
     repo_id: RepoId,
@@ -151,8 +155,19 @@ async fn run_debounced_watcher(mut ctx: WatcherWorkerContext) {
                     Some(Ok(event)) => {
                         ingest_notify_event(&ctx, &mut matcher, &mut acc, event);
                         // Coalesce immediately available queued events before re-arming timers.
-                        while let Ok(Ok(extra)) = ctx.raw_rx.try_recv() {
-                            ingest_notify_event(&ctx, &mut matcher, &mut acc, extra);
+                        // Bounded so a sustained event flood can never monopolize the executor
+                        // thread (on a current-thread runtime that would starve every other task,
+                        // including this worker's own debounce timers).
+                        for _ in 0..MAX_COALESCE_BATCH {
+                            match ctx.raw_rx.try_recv() {
+                                Ok(Ok(extra)) => {
+                                    ingest_notify_event(&ctx, &mut matcher, &mut acc, extra);
+                                }
+                                Ok(Err(err)) => {
+                                    tracing::debug!(repo_id = ?ctx.repo_id, error = %err, "notify backend warning");
+                                }
+                                Err(_) => break,
+                            }
                         }
                         if acc.kernel_rescan {
                             acc.kernel_rescan = false;
@@ -238,6 +253,9 @@ fn ingest_notify_event(
         acc.kernel_rescan = true;
         return;
     }
+    if !is_mutating_event_kind(&event.kind) {
+        return;
+    }
 
     let now = Instant::now();
     for raw_path in &event.paths {
@@ -297,6 +315,22 @@ fn ingest_notify_event(
                 acc.worktree_deadline = Some(now + delay);
             }
         }
+    }
+}
+
+/// Returns `false` for pure read-access notifications that never change repository state.
+///
+/// The Linux inotify backend subscribes to `IN_OPEN` / `IN_CLOSE_NOWRITE`, so merely *reading* a
+/// file under the watched tree yields `Access(Open)` / `Access(Close(Read))` events. Treating those
+/// as changes creates a self-sustaining feedback loop: an open of `.gitignore` or
+/// `.git/info/exclude` makes the worker rebuild its matcher, which re-opens the same file, which
+/// emits another open event, forever. Only `Access(Close(Write))` (a writer finished) is kept.
+fn is_mutating_event_kind(kind: &EventKind) -> bool {
+    match kind {
+        EventKind::Access(AccessKind::Close(AccessMode::Write)) => true,
+        EventKind::Access(_) => false,
+        EventKind::Any | EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_) => true,
+        EventKind::Other => true,
     }
 }
 

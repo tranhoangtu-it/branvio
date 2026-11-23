@@ -53,6 +53,8 @@ fn run_git(repo_dir: &Path, args: &[&str], extra_env: &[(&str, &str)]) -> String
 fn init_test_repo() -> (TempDir, HostPath, BranvioGitEngine) {
     let dir = TempDir::new().unwrap();
     run_git(dir.path(), &["init", "-b", "main"], &[]);
+    // Deterministic line endings: Windows runners ship `core.autocrlf=true` in system config.
+    run_git(dir.path(), &["config", "core.autocrlf", "false"], &[]);
     run_git(dir.path(), &["config", "user.name", "Branvio Test"], &[]);
     run_git(
         dir.path(),
@@ -344,7 +346,7 @@ async fn tier3_cli_commit_worktree_list_and_pickaxe_search() {
         .unwrap();
 
     let mut saw_finished_ok = false;
-    while let Some(ev) = handle.events.recv().await {
+    while let Some(ev) = next_cli_event(&mut handle.events).await {
         if let CliStreamEvent::Finished { success, .. } = ev {
             saw_finished_ok = success;
         }
@@ -372,7 +374,7 @@ async fn tier3_cli_commit_worktree_list_and_pickaxe_search() {
         .worktree_add(&root, &wt_path, "wt-branch", true)
         .await
         .unwrap();
-    while let Some(ev) = wt_add.events.recv().await {
+    while let Some(ev) = next_cli_event(&mut wt_add.events).await {
         if let CliStreamEvent::Finished { success, .. } = ev {
             assert!(success);
         }
@@ -387,7 +389,7 @@ async fn tier3_cli_commit_worktree_list_and_pickaxe_search() {
         .worktree_remove(&root, &wt_path, false)
         .await
         .unwrap();
-    while let Some(ev) = wt_rm.events.recv().await {
+    while let Some(ev) = next_cli_event(&mut wt_rm.events).await {
         if let CliStreamEvent::Finished { success, .. } = ev {
             assert!(success);
         }
@@ -431,6 +433,8 @@ async fn revwalk_handles_shallow_clone_cleanly() {
         shallow_parent.path(),
         &[
             "clone",
+            "-c",
+            "core.autocrlf=false",
             "--depth",
             "2",
             &file_url,
@@ -575,6 +579,7 @@ async fn sha256_repo_and_forged_ssh_pgp_signatures_report_unverified() {
         &["init", "--object-format=sha256", "-b", "main"],
         &[],
     );
+    run_git(dir.path(), &["config", "core.autocrlf", "false"], &[]);
     run_git(dir.path(), &["config", "user.name", "Branvio Test"], &[]);
     run_git(
         dir.path(),
@@ -698,7 +703,7 @@ async fn tier3_option_injection_and_missing_helper_rebase_are_blocked() {
         .unwrap();
     let mut finish_ok = None;
     let mut stderr_buf = String::new();
-    while let Some(ev) = h_detach.events.recv().await {
+    while let Some(ev) = next_cli_event(&mut h_detach.events).await {
         match ev {
             CliStreamEvent::StderrLine(line) => {
                 stderr_buf.push_str(&line);
@@ -844,7 +849,7 @@ async fn tier3_cancel_buffered_pickaxe_drop_handle_and_slow_receiver() {
     tokio::time::sleep(Duration::from_millis(300)).await;
     let mut saw_finished = None;
     let drain = tokio::time::timeout(Duration::from_secs(3), async {
-        while let Some(ev) = flood_handle.events.recv().await {
+        while let Some(ev) = next_cli_event(&mut flood_handle.events).await {
             if let CliStreamEvent::Finished { success, exit_code } = ev {
                 saw_finished = Some((success, exit_code));
             }
@@ -1061,7 +1066,7 @@ async fn tier1_reads_conflict_stages_tier3_discards_paths_and_detects_exec_bit()
         .await
         .unwrap();
     let mut succeeded = None;
-    while let Some(ev) = handle.events.recv().await {
+    while let Some(ev) = next_cli_event(&mut handle.events).await {
         if let CliStreamEvent::Finished { exit_code, success } = ev {
             succeeded = Some((exit_code, success));
         }
@@ -1102,4 +1107,13 @@ async fn tier1_reads_conflict_stages_tier3_discards_paths_and_detects_exec_bit()
     assert_eq!(stages.base.as_deref(), Some(b"base line\n".as_slice()));
     assert_eq!(stages.ours.as_deref(), Some(b"ours line\n".as_slice()));
     assert_eq!(stages.theirs.as_deref(), Some(b"theirs line\n".as_slice()));
+}
+
+/// Receives the next CLI stream event, failing fast instead of hanging CI if a `git` subprocess stalls.
+async fn next_cli_event(
+    events: &mut tokio::sync::mpsc::Receiver<git_engine::CliStreamEvent>,
+) -> Option<git_engine::CliStreamEvent> {
+    tokio::time::timeout(std::time::Duration::from_secs(60), events.recv())
+        .await
+        .expect("timed out after 60s waiting for the next git CLI stream event")
 }

@@ -8,39 +8,76 @@ use std::process::Command;
 use std::sync::Arc;
 use std::time::Duration;
 use tempfile::TempDir;
+use tokio::sync::mpsc;
 
-fn init_git_repo(root: &std::path::Path) {
+/// Upper bound for any single expected watcher event; generous for slow CI runners, but a broken
+/// watcher fails the test with a clear message instead of hanging the job.
+const EVENT_TIMEOUT: Duration = Duration::from_secs(20);
+
+fn git(root: &std::path::Path, args: &[&str]) {
     let out = Command::new("git")
-        .args(["init", "-b", "main"])
+        .args(args)
         .current_dir(root)
         .output()
         .unwrap();
-    assert!(out.status.success());
-    std::fs::write(root.join(".gitignore"), "*.ignored\nignored_dir/\n").unwrap();
-    std::fs::write(root.join("tracked.txt"), "hello\n").unwrap();
-    let _ = Command::new("git")
-        .args(["add", ".gitignore", "tracked.txt"])
-        .current_dir(root)
-        .output()
-        .unwrap();
-    let _ = Command::new("git")
-        .args(["config", "user.name", "WatcherTest"])
-        .current_dir(root)
-        .output()
-        .unwrap();
-    let _ = Command::new("git")
-        .args(["config", "user.email", "watch@branvio.rs"])
-        .current_dir(root)
-        .output()
-        .unwrap();
-    let _ = Command::new("git")
-        .args(["commit", "-m", "init"])
-        .current_dir(root)
-        .output()
-        .unwrap();
+    assert!(
+        out.status.success(),
+        "git {args:?} failed: {}",
+        String::from_utf8_lossy(&out.stderr)
+    );
 }
 
-#[tokio::test]
+fn init_git_repo(root: &std::path::Path) {
+    git(root, &["init", "-b", "main"]);
+    git(root, &["config", "core.autocrlf", "false"]);
+    git(root, &["config", "user.name", "WatcherTest"]);
+    git(root, &["config", "user.email", "watch@branvio.rs"]);
+    git(root, &["config", "commit.gpgsign", "false"]);
+    std::fs::write(root.join(".gitignore"), "*.ignored\nignored_dir/\n").unwrap();
+    std::fs::write(root.join("tracked.txt"), "hello\n").unwrap();
+    git(root, &["add", ".gitignore", "tracked.txt"]);
+    git(root, &["commit", "-m", "init"]);
+}
+
+/// Waits (bounded by [`EVENT_TIMEOUT`]) for the first `Dirty` event satisfying `pred`, skipping
+/// unrelated events. Panics with `what` on timeout or if the watcher channel closes.
+async fn expect_dirty(
+    rx: &mut mpsc::Receiver<WatcherEvent>,
+    what: &str,
+    pred: impl Fn(DirtyScopeFlags, bool) -> bool,
+) {
+    let wait = async {
+        loop {
+            match rx.recv().await {
+                Some(WatcherEvent::Dirty {
+                    scopes,
+                    storm_coalesced,
+                    ..
+                }) if pred(scopes, storm_coalesced) => return,
+                Some(_) => {}
+                None => panic!("watcher channel closed while waiting for {what}"),
+            }
+        }
+    };
+    if tokio::time::timeout(EVENT_TIMEOUT, wait).await.is_err() {
+        panic!("timed out after {EVENT_TIMEOUT:?} waiting for {what}");
+    }
+}
+
+/// Drains startup noise: waits until the watcher has been quiet for `quiet`, bounded overall.
+async fn settle(rx: &mut mpsc::Receiver<WatcherEvent>, quiet: Duration) {
+    let deadline = tokio::time::Instant::now() + EVENT_TIMEOUT;
+    while tokio::time::timeout(quiet, rx.recv()).await.is_ok() {
+        assert!(
+            tokio::time::Instant::now() < deadline,
+            "watcher never went quiet after registration (event feedback loop?)"
+        );
+    }
+}
+
+// Multi-threaded so the test's own timeouts keep firing even if a watcher worker misbehaves and
+// monopolizes an executor thread.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn watches_worktree_ignores_gitignored_and_separates_git_internal_refs() {
     let dir = TempDir::new().unwrap();
     let root = dir.path();
@@ -72,9 +109,14 @@ async fn watches_worktree_ignores_gitignored_and_separates_git_internal_refs() {
 
     // Let OS FSEvents / inotify settle after initial registration
     tokio::time::sleep(Duration::from_millis(200)).await;
-    while rx.try_recv().is_ok() {}
+    settle(&mut rx, Duration::from_millis(300)).await;
 
-    // 1. Write ignored files -> MUST NOT emit any Dirty event
+    // 1. Pure reads (inotify IN_OPEN / IN_CLOSE_NOWRITE) and writes to ignored files -> MUST NOT
+    //    emit any Dirty event. Reading `.gitignore` / `.git/info/exclude` previously re-triggered a
+    //    matcher rebuild that re-opened them: an endless feedback loop on Linux.
+    let _ = std::fs::read_to_string(root.join(".gitignore")).unwrap();
+    let _ = std::fs::read_to_string(root.join("tracked.txt")).unwrap();
+    let _ = std::fs::read_to_string(root.join(".git/HEAD")).unwrap();
     std::fs::create_dir_all(root.join("ignored_dir")).unwrap();
     std::fs::write(root.join("ignored_dir").join("artifact.bin"), b"123").unwrap();
     std::fs::write(root.join("build.ignored"), b"ignored").unwrap();
@@ -82,43 +124,30 @@ async fn watches_worktree_ignores_gitignored_and_separates_git_internal_refs() {
     let no_event = tokio::time::timeout(Duration::from_millis(280), rx.recv()).await;
     assert!(
         no_event.is_err(),
-        "gitignored writes must not emit watcher events, got {:?}",
-        no_event
+        "gitignored writes must not emit watcher events, got {no_event:?}"
     );
 
     // 2. Write tracked worktree file -> MUST emit Dirty { WORKTREE }
     std::fs::write(root.join("tracked.txt"), "modified\n").unwrap();
-    let mut saw_worktree = false;
-    let deadline = tokio::time::Instant::now() + Duration::from_secs(3);
-    while tokio::time::Instant::now() < deadline {
-        if let Ok(Some(ev)) = tokio::time::timeout(Duration::from_millis(400), rx.recv()).await
-            && let WatcherEvent::Dirty { scopes, .. } = ev
-            && scopes.union(DirtyScopeFlags::WORKTREE) == scopes
-        {
-            saw_worktree = true;
-            break;
-        }
-    }
-    assert!(saw_worktree, "tracked worktree edit must emit WORKTREE");
+    expect_dirty(
+        &mut rx,
+        "WORKTREE dirty event for tracked edit",
+        |scopes, _| scopes.union(DirtyScopeFlags::WORKTREE) == scopes,
+    )
+    .await;
 
     // 3. Touch .git/refs/heads/feature -> MUST emit REFS_OR_HEAD rapidly
     let head_oid = std::fs::read_to_string(root.join(".git/refs/heads/main")).unwrap();
     std::fs::write(root.join(".git/refs/heads/feature"), head_oid).unwrap();
-    let mut saw_refs = false;
-    let deadline = tokio::time::Instant::now() + Duration::from_secs(3);
-    while tokio::time::Instant::now() < deadline {
-        if let Ok(Some(ev)) = tokio::time::timeout(Duration::from_millis(400), rx.recv()).await
-            && let WatcherEvent::Dirty { scopes, .. } = ev
-            && scopes.has_refs_or_head()
-        {
-            saw_refs = true;
-            break;
-        }
-    }
-    assert!(saw_refs, ".git/refs update must emit REFS_OR_HEAD");
+    expect_dirty(
+        &mut rx,
+        "REFS_OR_HEAD dirty event for .git/refs update",
+        |scopes, _| scopes.has_refs_or_head(),
+    )
+    .await;
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn storm_burst_coalesces_into_storm_flagged_dirty_event() {
     let dir = TempDir::new().unwrap();
     let root = dir.path();
@@ -146,31 +175,19 @@ async fn storm_burst_coalesces_into_storm_flagged_dirty_event() {
         .unwrap();
 
     tokio::time::sleep(Duration::from_millis(200)).await;
-    while rx.try_recv().is_ok() {}
+    settle(&mut rx, Duration::from_millis(300)).await;
 
     // Burst 20 un-ignored file creations back-to-back
     for i in 0..20 {
         std::fs::write(root.join(format!("burst_{i}.txt")), format!("line {i}\n")).unwrap();
     }
 
-    let mut saw_storm = false;
-    let deadline = tokio::time::Instant::now() + Duration::from_secs(3);
-    while tokio::time::Instant::now() < deadline {
-        if let Ok(Some(ev)) = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await
-            && let WatcherEvent::Dirty {
-                scopes,
-                storm_coalesced,
-                ..
-            } = ev
-            && scopes.union(DirtyScopeFlags::WORKTREE) == scopes
-            && storm_coalesced
-        {
-            saw_storm = true;
-            break;
-        }
-    }
-    assert!(
-        saw_storm,
-        "burst exceeding threshold should coalesce with storm_coalesced = true"
-    );
+    expect_dirty(
+        &mut rx,
+        "storm-coalesced WORKTREE dirty event after a 20-file burst",
+        |scopes, storm_coalesced| {
+            scopes.union(DirtyScopeFlags::WORKTREE) == scopes && storm_coalesced
+        },
+    )
+    .await;
 }

@@ -94,6 +94,8 @@ fn init_push_fixture() -> PushFixture {
 
     let mine_dir = TempDir::new().unwrap();
     run_git(mine_dir.path(), &["init", "-b", "main"]);
+    // Deterministic line endings: Windows runners ship `core.autocrlf=true` in system config.
+    run_git(mine_dir.path(), &["config", "core.autocrlf", "false"]);
     configure_identity(mine_dir.path());
     run_git(mine_dir.path(), &["remote", "add", "origin", &bare_url]);
     commit_file(mine_dir.path(), "base.txt", "base\n", "base");
@@ -114,7 +116,18 @@ fn init_push_fixture() -> PushFixture {
 /// Simulates a teammate pushing a new commit to `main` from a separate clone.
 fn teammate_pushes(bare_url: &str) -> GitOid {
     let other = TempDir::new().unwrap();
-    run_git(other.path(), &["clone", "-b", "main", bare_url, "theirs"]);
+    run_git(
+        other.path(),
+        &[
+            "clone",
+            "-c",
+            "core.autocrlf=false",
+            "-b",
+            "main",
+            bare_url,
+            "theirs",
+        ],
+    );
     let theirs = other.path().join("theirs");
     configure_identity(&theirs);
     let oid = commit_file(&theirs, "teammate.txt", "precious\n", "teammate work");
@@ -131,7 +144,7 @@ fn rewrite_local_history(dir: &Path) -> GitOid {
 async fn drain(mut handle: CliCommandHandle) -> (bool, String) {
     let mut ok = false;
     let mut stderr = String::new();
-    while let Some(ev) = handle.events.recv().await {
+    while let Some(ev) = next_cli_event(&mut handle.events).await {
         match ev {
             CliStreamEvent::StderrLine(line) => {
                 stderr.push_str(&line);
@@ -359,4 +372,13 @@ async fn with_lease_succeeds_without_any_reflog() {
         .await;
     assert!(ok, "lease push without reflog should succeed: {stderr}");
     assert_eq!(fx.remote_main_oid(), rewritten);
+}
+
+/// Receives the next CLI stream event, failing fast instead of hanging CI if a `git` subprocess stalls.
+async fn next_cli_event(
+    events: &mut tokio::sync::mpsc::Receiver<git_engine::CliStreamEvent>,
+) -> Option<git_engine::CliStreamEvent> {
+    tokio::time::timeout(std::time::Duration::from_secs(60), events.recv())
+        .await
+        .expect("timed out after 60s waiting for the next git CLI stream event")
 }

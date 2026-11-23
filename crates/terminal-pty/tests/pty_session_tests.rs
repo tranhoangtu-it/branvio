@@ -45,13 +45,19 @@ async fn spawns_real_pty_executes_command_renders_ansi_colors_resizes_and_closes
         .unwrap();
 
     // Send a marker command printing colored ANSI text (split string prevents matching typed command echo)
+    #[cfg(unix)]
     let cmd = "printf '\\033[31mBRANVIO_ANSI_%s\\033[0m\\n' 'OK'\n";
+    // Windows: the default profile is PowerShell (`pwsh.exe`/`powershell.exe`), which has no
+    // `printf`; ConPTY submits a line on CR (the Enter key), not on a bare LF.
+    #[cfg(windows)]
+    let cmd = "Write-Output (\"$([char]27)[31mBRANVIO_ANSI_{0}$([char]27)[0m\" -f 'OK')\r";
     session.write_bytes(cmd.as_bytes()).await.unwrap();
 
     let mut found_text = false;
     let mut found_red_fg = false;
     let needle = "BRANVIO_ANSI_OK";
-    let deadline = tokio::time::Instant::now() + Duration::from_secs(4);
+    // Generous: a cold PowerShell start on CI runners can take several seconds.
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(20);
     while tokio::time::Instant::now() < deadline {
         let _ = tokio::time::timeout(Duration::from_millis(250), damage_rx.recv()).await;
         let snap = session.snapshot_viewport().unwrap();

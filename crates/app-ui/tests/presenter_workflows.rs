@@ -64,6 +64,9 @@ fn run_git(repo_dir: &Path, args: &[&str]) -> String {
 fn init_repo(default_branch: &str) -> TempDir {
     let dir = TempDir::new().unwrap();
     run_git(dir.path(), &["init", "-b", default_branch]);
+    // Deterministic line endings: Windows runners ship `core.autocrlf=true` in system config,
+    // which would make checkouts/merges write CRLF into the worktree.
+    run_git(dir.path(), &["config", "core.autocrlf", "false"]);
     run_git(dir.path(), &["config", "user.name", "Branvio E2E"]);
     run_git(dir.path(), &["config", "user.email", "e2e@branvio.rs"]);
     run_git(dir.path(), &["config", "commit.gpgsign", "false"]);
@@ -1226,9 +1229,15 @@ async fn phase5_watcher_pty_forge_and_ai_copilot_end_to_end() {
         })
         .await
         .unwrap();
-    presenter.send_terminal_command_line("printf 'PTY_%s_OK\\n' 'E2E'");
+    // The marker is assembled by the shell so the typed command echo never matches it.
+    // Windows spawns PowerShell (`pwsh.exe`/`powershell.exe`), which has no `printf`.
+    #[cfg(unix)]
+    let marker_command = "printf 'PTY_%s_OK\\n' 'E2E'";
+    #[cfg(windows)]
+    let marker_command = "Write-Output ('PTY_{0}_OK' -f 'E2E')";
+    presenter.send_terminal_command_line(marker_command);
     presenter
-        .wait_until(Duration::from_secs(5), |p| {
+        .wait_until(Duration::from_secs(20), |p| {
             p.active_tab().is_some_and(|t| {
                 t.terminal_snapshot.as_ref().is_some_and(|snap| {
                     let s: String = snap.cells.iter().map(|c| c.ch).collect();
@@ -1316,7 +1325,10 @@ async fn force_push_lease_uses_oid_captured_at_confirmation_and_plain_push_never
 
     // 3. While the dialog is open a teammate pushes C and a background fetch advances origin/main.
     let other_parent = TempDir::new().unwrap();
-    run_git(other_parent.path(), &["clone", bare_str, "other"]);
+    run_git(
+        other_parent.path(),
+        &["clone", "-c", "core.autocrlf=false", bare_str, "other"],
+    );
     let other = other_parent.path().join("other");
     run_git(&other, &["config", "commit.gpgsign", "false"]);
     std::fs::write(other.join("c.txt"), "c\n").unwrap();

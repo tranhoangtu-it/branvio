@@ -73,6 +73,8 @@ fn init_fixture() -> Fixture {
     let repo_dir = TempDir::new().unwrap();
     let root = repo_dir.path();
     run_git(root, &["init", "-b", "main"]);
+    // Deterministic line endings: Windows runners ship `core.autocrlf=true` in system config.
+    run_git(root, &["config", "core.autocrlf", "false"]);
     run_git(root, &["config", "user.name", "BranvioTester"]);
     run_git(root, &["config", "user.email", "tester@branvio.rs"]);
     run_git(root, &["config", "commit.gpgsign", "false"]);
@@ -112,7 +114,7 @@ fn make_dirty(fx: &Fixture) {
 }
 
 async fn finish_cli(mut handle: CliCommandHandle) {
-    while let Some(ev) = handle.events.recv().await {
+    while let Some(ev) = next_cli_event(&mut handle.events).await {
         if let CliStreamEvent::Finished { success, .. } = ev {
             assert!(success, "cli operation should succeed");
             break;
@@ -299,4 +301,13 @@ async fn clean_worktree_creates_no_snapshot_ref() {
         refs.is_empty(),
         "unexpected snapshot refs for op {op_id}: {refs}"
     );
+}
+
+/// Receives the next CLI stream event, failing fast instead of hanging CI if a `git` subprocess stalls.
+async fn next_cli_event(
+    events: &mut tokio::sync::mpsc::Receiver<git_engine::CliStreamEvent>,
+) -> Option<git_engine::CliStreamEvent> {
+    tokio::time::timeout(std::time::Duration::from_secs(60), events.recv())
+        .await
+        .expect("timed out after 60s waiting for the next git CLI stream event")
 }

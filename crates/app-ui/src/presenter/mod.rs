@@ -55,6 +55,16 @@ use tokio::sync::{Mutex, mpsc};
 /// Remote used for push / force push from the toolbar and palette.
 const DEFAULT_PUSH_REMOTE: &str = "origin";
 
+/// Bytes a terminal sends for the Enter key when submitting a command line.
+///
+/// Windows ConPTY translates VT input into console key events: only CR becomes `VK_RETURN`,
+/// while a bare LF is delivered as Ctrl+Enter, which PowerShell/PSReadLine and `cmd.exe` do not
+/// treat as "submit". Unix PTYs keep LF (the line discipline / line editors accept it directly).
+#[cfg(windows)]
+const TERMINAL_ENTER_KEY: &[u8] = b"\r";
+#[cfg(not(windows))]
+const TERMINAL_ENTER_KEY: &[u8] = b"\n";
+
 /// Environment variable that pre-enables cloud AI uploads when no setting UI is available.
 ///
 /// Fallback only: accepted values are `1`/`true`/`yes`. The in-app toggle is the primary control.
@@ -2259,7 +2269,8 @@ impl BranvioPresenter {
         );
     }
 
-    /// Writes a shell command line (`line + "\n"`) to the active tab's PTY stdin.
+    /// Writes a shell command line followed by the Enter key (`\n`; `\r` on Windows ConPTY) to
+    /// the active tab's PTY stdin.
     ///
     /// Destructive `git` commands (see [`destructive_guard`]) are held back and open
     /// [`ActiveModal::ConfirmDestructiveTerminalCommand`] instead; they are sent only after
@@ -2369,7 +2380,7 @@ impl BranvioPresenter {
 
     fn write_terminal_line(&mut self, line: &str) {
         let mut bytes = line.as_bytes().to_vec();
-        bytes.push(b'\n');
+        bytes.extend_from_slice(TERMINAL_ENTER_KEY);
         self.send_terminal_bytes(bytes);
     }
 

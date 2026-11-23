@@ -36,6 +36,8 @@ fn init_test_repo() -> (TempDir, HostPath) {
     let dir = TempDir::new().unwrap();
     let root = dir.path();
     run_git(root, &["init", "-b", "main"]);
+    // Deterministic line endings: Windows runners ship `core.autocrlf=true` in system config.
+    run_git(root, &["config", "core.autocrlf", "false"]);
     run_git(root, &["config", "user.name", "BranvioTester"]);
     run_git(root, &["config", "user.email", "tester@branvio.rs"]);
     std::fs::write(root.join("app.txt"), "v1\n").unwrap();
@@ -46,7 +48,7 @@ fn init_test_repo() -> (TempDir, HostPath) {
 }
 
 async fn finish_cli(mut handle: git_engine::CliCommandHandle) {
-    while let Some(ev) = handle.events.recv().await {
+    while let Some(ev) = next_cli_event(&mut handle.events).await {
         if let git_engine::CliStreamEvent::Finished { success, .. } = ev {
             assert!(success, "cli operation should succeed");
             break;
@@ -257,4 +259,13 @@ async fn external_cli_divergence_aborts_undo_and_pushed_history_requires_confirm
         .working_tree_status(&summary.workdir_root, CancelToken::new())
         .await
         .unwrap();
+}
+
+/// Receives the next CLI stream event, failing fast instead of hanging CI if a `git` subprocess stalls.
+async fn next_cli_event(
+    events: &mut tokio::sync::mpsc::Receiver<git_engine::CliStreamEvent>,
+) -> Option<git_engine::CliStreamEvent> {
+    tokio::time::timeout(std::time::Duration::from_secs(60), events.recv())
+        .await
+        .expect("timed out after 60s waiting for the next git CLI stream event")
 }

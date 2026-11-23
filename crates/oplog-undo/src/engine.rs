@@ -1234,6 +1234,7 @@ mod tests {
         let repo = tempfile::TempDir::new().unwrap();
         let db = tempfile::TempDir::new().unwrap();
         sh(repo.path(), &["init", "-b", "main"]);
+        sh(repo.path(), &["config", "core.autocrlf", "false"]);
         std::fs::write(repo.path().join("a.txt"), "a\n").unwrap();
         sh(repo.path(), &["add", "a.txt"]);
         sh(repo.path(), &["commit", "-m", "one"]);
