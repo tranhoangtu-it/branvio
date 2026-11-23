@@ -1,0 +1,57 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Branvio"
+           Manufacturer="Branvio Contributors"
+           Version="0.1.0.0"
+           UpgradeCode="D39A91F2-5C31-4E3A-B27A-91C739C2E010"
+           Scope="perUser">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Branvio is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <!-- App icon (regenerate with scripts/build_app_icons.py); also shown in "Installed apps". -->
+    <Icon Id="BranvioIcon" SourceFile="branvio.ico" />
+    <Property Id="ARPPRODUCTICON" Value="BranvioIcon" />
+    <Feature Id="MainApplication" Title="Branvio Desktop" Level="1">
+      <ComponentGroupRef Id="AppExecutables" />
+      <ComponentGroupRef Id="StartMenuShortcuts" />
+    </Feature>
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="INSTALLFOLDER" Name="Programs\Branvio" />
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="Branvio" />
+    </StandardDirectory>
+  </Package>
+
+  <Fragment>
+    <ComponentGroup Id="AppExecutables" Directory="INSTALLFOLDER">
+      <Component Id="BranvioExeComponent" Guid="8E8C7D60-90AA-4120-A2B0-189A54F54D11">
+        <File Id="BranvioExeFile" Source="..\..\target\release\app-ui.exe" Name="branvio.exe" KeyPath="yes" />
+      </Component>
+      <!-- License texts + third-party attributions must ship with every binary distribution.
+           Sources are the files at the repository root (relative to this .wxs). -->
+      <Component Id="LicenseMitComponent" Guid="E2C80FFC-ED15-4FAE-83CD-D999B4010DE2">
+        <File Id="LicenseMitFile" Source="..\..\LICENSE-MIT" Name="LICENSE-MIT" KeyPath="yes" />
+      </Component>
+      <Component Id="LicenseApacheComponent" Guid="FFA7C5DD-1F41-4151-BA63-38D1AC311027">
+        <File Id="LicenseApacheFile" Source="..\..\LICENSE-APACHE" Name="LICENSE-APACHE" KeyPath="yes" />
+      </Component>
+      <Component Id="ThirdPartyNoticesComponent" Guid="7925DCF9-0B34-4571-B998-165A49145675">
+        <File Id="ThirdPartyNoticesFile" Source="..\..\THIRD_PARTY_NOTICES.md" Name="THIRD_PARTY_NOTICES.md" KeyPath="yes" />
+      </Component>
+      <Component Id="ThirdPartyLicensesComponent" Guid="CAAEA988-C436-4FEF-BC17-4CD17BC52CE0">
+        <File Id="ThirdPartyLicensesFile" Source="..\..\THIRD_PARTY_LICENSES.md" Name="THIRD_PARTY_LICENSES.md" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+    <ComponentGroup Id="StartMenuShortcuts" Directory="ApplicationProgramsFolder">
+      <Component Id="StartMenuShortcut" Guid="F0E65A2B-19A7-43D5-8CE1-48FDFA666801">
+        <Shortcut Id="BranvioStartMenuShortcut"
+                  Name="Branvio"
+                  Description="High-performance native Rust Git GUI client"
+                  Target="[INSTALLFOLDER]branvio.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="BranvioIcon" />
+        <RemoveFolder Id="RemoveProgramsDir" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\Branvio" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

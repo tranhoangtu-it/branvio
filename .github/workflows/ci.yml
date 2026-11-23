@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+# Least privilege: CI only needs to read the repository.
+permissions:
+  contents: read
+
+jobs:
+  supply-chain:
+    name: Supply chain (cargo-deny, third-party notices)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      # Licenses (deny copyleft by default), RustSec advisories, wildcard/banned crates,
+      # and crate sources — configured in deny.toml.
+      - name: cargo deny check
+        uses: EmbarkStudios/cargo-deny-action@17aeb3c839e42274e2b8adf721c8c65edfdc74dd # v2
+        with:
+          command: check
+          arguments: --all-features
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+        with:
+          toolchain: stable
+
+      # The generator reads every crate's license / NOTICE files from the extracted registry
+      # sources, so make sure all packages in Cargo.lock (all targets) are downloaded first.
+      - name: Fetch crate sources
+        run: cargo fetch --locked
+
+      - name: THIRD_PARTY_NOTICES.md and THIRD_PARTY_LICENSES.md are up to date
+        run: python3 scripts/gen_third_party_notices.py --check
+
+  check-and-test:
+    name: ${{ matrix.os }} (${{ matrix.target }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: Linux
+            runner: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macOS
+            runner: macos-latest
+            target: aarch64-apple-darwin
+          - os: Windows
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+
+      - name: Cache Cargo registry & target
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+
+      - name: Install Linux X11/Wayland/Font/Keyring dependencies
+        if: matrix.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxkbcommon-x11-dev libxkbcommon-dev \
+            libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
+            libwayland-dev libvulkan-dev libfontconfig1-dev \
+            libdbus-1-dev libsecret-1-dev pkg-config cmake
+
+      - name: Verify formatting
+        run: cargo fmt --all -- --check
+
+      - name: Clippy (workspace default features, strict -D warnings)
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Clippy (app-ui headless mode, UI-decoupling verification)
+        run: cargo clippy -p app-ui --all-targets --no-default-features --features headless -- -D warnings
+
+      - name: Run full workspace test suite
+        run: cargo test --workspace

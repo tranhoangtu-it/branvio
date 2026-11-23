@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Branvio — Resolve conflict (dark)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible+Next:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;color-scheme:dark;background:#0F141A;color:#E6EBF0;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;font-size:14px;line-height:1.4}
+a{color:#7AA7F5}a:hover{color:#A9C6F8}
+.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid #2A333E;border-radius:8px;background:#161C24;color:#E6EBF0;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#222A34}
+.btn:focus-visible,.f:focus-visible{outline:2px solid #2F6FE0;outline-offset:2px}
+.btn:disabled{color:#6B7886;background:#0F141A;cursor:not-allowed}
+.mono{font-family:'Atkinson Hyperlegible Mono',ui-monospace,monospace}
+.f{display:flex;align-items:center;gap:8px;padding:8px 12px;color:#E6EBF0;text-decoration:none;font-size:13px;border-radius:6px;margin:0 6px}
+.f:hover{background:#1E2630}
+.pane{flex:1 1 360px;min-width:0;display:flex;flex-direction:column;border:1px solid #2A333E;border-radius:10px;background:#161C24;overflow:hidden}
+.pane h2{display:flex;align-items:center;gap:8px;margin:0;padding:10px 14px;font-size:13px;font-weight:700;border-bottom:1px solid #1F262F}
+.code{padding:8px 0;font-size:13px}
+.cl{display:grid;grid-template-columns:44px minmax(0,1fr);height:24px;align-items:center;white-space:pre}
+.cl span:first-child{color:#6B7886;text-align:right;padding-right:12px}
+.mine{background:#16253D}
+.theirs{background:#2A1B3D}
+</style>
+</helmet>
+<div style="min-height: 900px; display: flex; flex-direction: column; background: #0F141A">
+
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; background: #2B2412; border-bottom: 1px solid #5A4520">
+    <svg class="ic" viewBox="0 0 24 24" role="img" aria-label="Merge in progress" style="width: 20px; height: 20px; color: #FBBF24"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M6 21V9a9 9 0 0 0 9 9"></path></svg>
+    <div>
+      <h1 style="margin: 0; font-size: 15px; font-weight: 700">Merging feat/ai-redaction into main</h1>
+      <p style="margin: 0; font-size: 13px; color: #F3D9A4">1 conflict left in 1 file. Choose a side or edit the result, then commit the merge.</p>
+    </div>
+    <span style="flex: 1"></span>
+    <button class="btn" type="button">Abort merge</button>
+    <button class="btn" type="button" disabled>
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+      Commit merge
+    </button>
+  </header>
+
+  <div style="flex: 1; display: flex; flex-wrap: wrap; min-height: 0">
+
+    <nav aria-label="Conflicted files" style="flex: 1 1 220px; max-width: 260px; padding: 12px 0; background: #0F141A; border-right: 1px solid #2A333E">
+      <h2 style="margin: 4px 18px 8px; font-size: 13px; font-weight: 700">Files</h2>
+      <a class="f" href="#" aria-current="true" style="background: #1E2A3D">
+        <svg class="ic" viewBox="0 0 24 24" role="img" aria-label="Has conflicts" style="color: #F59E0B"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>
+        <span class="mono" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">ai-copilot/src/client.rs</span>
+        <span style="margin-left: auto; font-size: 12px; color: #FBBF24">1 left</span>
+      </a>
+      <a class="f" href="#">
+        <svg class="ic" viewBox="0 0 24 24" role="img" aria-label="Resolved" style="color: #4ADE80"><path d="M20 6 9 17l-5-5"></path></svg>
+        <span class="mono" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">ai-copilot/Cargo.toml</span>
+        <span style="margin-left: auto; font-size: 12px; color: #4ADE80">Done</span>
+      </a>
+    </nav>
+
+    <main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 16px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span class="mono" style="font-size: 13px; font-weight: 500">crates/ai-copilot/src/client.rs</span>
+        <span style="font-size: 12px; color: #9AA7B5">Conflict 1 of 1, in fn new</span>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px">
+        <section class="pane" aria-label="Your version">
+          <h2><span style="width: 10px; height: 10px; border-radius: 5px; background: #2F6FE0"></span>Yours <span style="font-weight: 400; color: #9AA7B5">main</span></h2>
+          <div class="code mono">
+            <div class="cl"><span>78</span><span>    let http = reqwest::Client::builder()</span></div>
+            <div class="cl mine"><span>79</span><span>        .timeout(Duration::from_secs(90))</span></div>
+            <div class="cl"><span>80</span><span>        .build()?;</span></div>
+          </div>
+          <div style="padding: 10px 14px; border-top: 1px solid #1F262F"><button class="btn" type="button">Use yours</button></div>
+        </section>
+        <section class="pane" aria-label="Incoming version">
+          <h2><span style="width: 10px; height: 10px; border-radius: 5px; background: #A855F7"></span>Incoming <span style="font-weight: 400; color: #9AA7B5">feat/ai-redaction</span></h2>
+          <div class="code mono">
+            <div class="cl"><span>78</span><span>    let http = reqwest::Client::builder()</span></div>
+            <div class="cl theirs"><span>79</span><span>        .timeout(Duration::from_secs(60))</span></div>
+            <div class="cl theirs"><span>80</span><span>        .https_only(true)</span></div>
+            <div class="cl"><span>81</span><span>        .build()?;</span></div>
+          </div>
+          <div style="padding: 10px 14px; border-top: 1px solid #1F262F; display: flex; gap: 8px"><button class="btn" type="button">Use incoming</button><button class="btn" type="button">Use both</button></div>
+        </section>
+      </div>
+
+      <section class="pane" aria-label="Result" style="flex: 1 1 auto">
+        <h2>Result <span style="font-weight: 400; color: #9AA7B5">You can type here to edit</span></h2>
+        <div class="code mono">
+          <div class="cl"><span>76</span><span>pub fn new(config: AiProviderConfig) -&gt; Result&lt;Self, AiError&gt; {</span></div>
+          <div class="cl"><span>77</span><span>    let keys = config.key_source.clone();</span></div>
+          <div class="cl"><span>78</span><span>    let http = reqwest::Client::builder()</span></div>
+          <div class="cl" style="height: 52px; margin: 2px 12px 2px 44px; border: 1.5px dashed #D6A84B; border-radius: 6px; background: #211C10; white-space: normal; display: flex; align-items: center; justify-content: center; font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif; color: #F3D9A4">Pick yours, incoming or both above</div>
+          <div class="cl"><span>79</span><span>        .build()?;</span></div>
+          <div class="cl"><span>80</span><span>    Ok(Self { http, keys, config })</span></div>
+          <div class="cl"><span>81</span><span>}</span></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

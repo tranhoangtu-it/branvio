@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Branvio — Design system</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible+Next:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F6F8;color:#18212B;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;font-size:14px;line-height:1.4}
+a{color:#1F5FD1}a:hover{color:#174AA6}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid #DCE2E8;border-radius:8px;background:#FFFFFF;color:#18212B;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:focus-visible{outline:2px solid #1F5FD1;outline-offset:2px}
+.btn:disabled{color:#8A96A3;background:#F4F6F8;cursor:not-allowed}
+.mono{font-family:'Atkinson Hyperlegible Mono',ui-monospace,monospace}
+.card{background:#FFFFFF;border:1px solid #DCE2E8;border-radius:12px;padding:20px}
+.card h2{margin:0 0 14px;font-size:15px;font-weight:700}
+.sw{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px}
+.chip{width:40px;height:40px;border-radius:8px;border:1px solid rgba(24,33,43,0.12)}
+.meta{color:#566373;font-size:12px}
+.icon{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:8px;font-size:12px;color:#3E4A57}
+.icon svg{color:#18212B}
+.ref{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:10px;font-size:12px;border:1px solid}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 32px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; background: #F4F6F8">
+
+  <section class="card" aria-label="Colors">
+    <h2>Color</h2>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div class="sw"><span class="chip" style="background: #F4F6F8"></span><span>Canvas <span class="meta">app background</span></span><span class="mono meta">#F4F6F8</span></div>
+      <div class="sw"><span class="chip" style="background: #FFFFFF"></span><span>Surface <span class="meta">panels, lists</span></span><span class="mono meta">#FFFFFF</span></div>
+      <div class="sw"><span class="chip" style="background: #18212B"></span><span>Ink <span class="meta">text, 16:1</span></span><span class="mono meta">#18212B</span></div>
+      <div class="sw"><span class="chip" style="background: #566373"></span><span>Muted <span class="meta">secondary text, 6:1</span></span><span class="mono meta">#566373</span></div>
+      <div class="sw"><span class="chip" style="background: #DCE2E8"></span><span>Line <span class="meta">borders, dividers</span></span><span class="mono meta">#DCE2E8</span></div>
+      <div class="sw"><span class="chip" style="background: #1F5FD1"></span><span>Action <span class="meta">one primary button, 5.9:1</span></span><span class="mono meta">#1F5FD1</span></div>
+      <div class="sw"><span class="chip" style="background: #17804A"></span><span>Added <span class="meta">on #E6F4EC</span></span><span class="mono meta">#17804A</span></div>
+      <div class="sw"><span class="chip" style="background: #B8322E"></span><span>Removed <span class="meta">on #FBEAEA</span></span><span class="mono meta">#B8322E</span></div>
+    </div>
+    <h2 style="margin-top: 22px">Graph lanes</h2>
+    <p class="meta" style="margin: -8px 0 12px">From METRO_PALETTE in graph-layout. Only the graph and branch dots use them.</p>
+    <div style="display: flex; gap: 10px">
+      <div style="text-align: center"><span class="chip" style="display: block; background: #38BDF8"></span><span class="meta">main</span></div>
+      <div style="text-align: center"><span class="chip" style="display: block; background: #A855F7"></span><span class="meta">develop</span></div>
+      <div style="text-align: center"><span class="chip" style="display: block; background: #34D399"></span><span class="meta">release</span></div>
+      <div style="text-align: center"><span class="chip" style="display: block; background: #F87171"></span><span class="meta">hotfix</span></div>
+      <div style="text-align: center"><span class="chip" style="display: block; background: #FBBF24"></span><span class="meta">feature</span></div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Type and components" style="display: flex; flex-direction: column; gap: 22px">
+    <div>
+      <h2>Type</h2>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="font-size: 17px; font-weight: 700">Commit title 17 / bold</div>
+        <div style="font-size: 15px; font-weight: 700">Section heading 15 / bold</div>
+        <div style="font-size: 14px">Body text 14 / regular, line height 1.4</div>
+        <div style="font-size: 13px">Interface label 13 / regular</div>
+        <div class="meta">Caption 12 / muted</div>
+        <div class="mono" style="font-size: 13px">12fb66b  let masked = mask_secrets(diff);</div>
+      </div>
+      <p class="meta" style="margin: 10px 0 0">Atkinson Hyperlegible Next for the interface, Atkinson Hyperlegible Mono for hashes and code. Sentence case everywhere.</p>
+    </div>
+    <div>
+      <h2>Buttons</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <button class="btn" type="button" style="background: #1F5FD1; border-color: #1F5FD1; color: #FFFFFF">Push</button>
+        <button class="btn" type="button">Fetch</button>
+        <button class="btn" type="button" aria-label="Open terminal" style="width: 36px; padding: 0; justify-content: center"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" x2="20" y1="19" y2="19"></line></svg></button>
+        <button class="btn" type="button" disabled>Commit merge</button>
+      </div>
+      <p class="meta" style="margin: 10px 0 0">At most one blue button per screen. Icons always come with a text label, except well-known tools with a tooltip.</p>
+    </div>
+    <div>
+      <h2>Labels</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+        <span class="ref" style="border-color: #9FD9F5; background: #E8F6FD; color: #075985">main</span>
+        <span class="ref" style="border-color: #C9A6F4; background: #F4ECFE; color: #6B21A8">feat/ai-redaction</span>
+        <span style="width: 18px; height: 18px; border-radius: 4px; display: inline-grid; place-items: center; font-size: 11px; font-weight: 700; background: #FDF0D5; color: #8A5300">M</span>
+        <span style="width: 18px; height: 18px; border-radius: 4px; display: inline-grid; place-items: center; font-size: 11px; font-weight: 700; background: #E6F4EC; color: #17804A">N</span>
+        <span style="width: 18px; height: 18px; border-radius: 4px; display: inline-grid; place-items: center; font-size: 11px; font-weight: 700; background: #FBEAEA; color: #B8322E">D</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Icons and credits" style="display: flex; flex-direction: column">
+    <h2>Icons</h2>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px">
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>refresh-cw</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17V3"></path><path d="m6 11 6 6 6-6"></path><path d="M19 21H5"></path></svg>arrow-down-to-line</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m18 9-6-6-6 6"></path><path d="M12 3v14"></path><path d="M5 21h14"></path></svg>arrow-up-from-line</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" x2="6" y1="3" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>git-branch</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M6 21V9a9 9 0 0 0 9 9"></path></svg>git-merge</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><line x1="3" x2="9" y1="12" y2="12"></line><line x1="15" x2="21" y1="12" y2="12"></line></svg>git-commit</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" x2="6" y1="9" y2="21"></line></svg>git-pull-request</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg>archive</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"></path></svg>undo-2</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>search</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" x2="20" y1="19" y2="19"></line></svg>terminal</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>cloud</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path></svg>folder</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>sparkles</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>circle-alert</div>
+      <div class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>check</div>
+    </div>
+    <p class="meta" style="margin: 10px 0 0">Lucide, 24 px grid, 2 px stroke, drawn at 16 px in the app.</p>
+
+    <h2 style="margin-top: auto; padding-top: 18px">Free resources</h2>
+    <ul style="margin: 0; padding-left: 18px; font-size: 13px; display: flex; flex-direction: column; gap: 6px">
+      <li><a href="https://lucide.dev">Lucide icons</a> <span class="meta">ISC license, commercial use allowed</span></li>
+      <li><a href="https://fonts.google.com/specimen/Atkinson+Hyperlegible+Next">Atkinson Hyperlegible Next</a> <span class="meta">SIL Open Font License</span></li>
+      <li><a href="https://fonts.google.com/specimen/Atkinson+Hyperlegible+Mono">Atkinson Hyperlegible Mono</a> <span class="meta">SIL Open Font License</span></li>
+    </ul>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

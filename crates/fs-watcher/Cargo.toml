@@ -1,0 +1,23 @@
+[package]
+name = "fs-watcher"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Dual-stream adaptive debounced filesystem watcher separating .git control signals from .gitignore-filtered worktree changes"
+
+[lints]
+workspace = true
+
+[dependencies]
+ignore.workspace = true
+branvio-core.workspace = true
+notify.workspace = true
+notify-debouncer-full.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

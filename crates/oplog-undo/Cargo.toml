@@ -1,0 +1,25 @@
+[package]
+name = "oplog-undo"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Time-Machine transactional Undo/Redo operation log backed by redb and Git Reflog with remote-exposure safety checks"
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait.workspace = true
+compact_str.workspace = true
+git-engine.workspace = true
+branvio-core.workspace = true
+redb.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Branvio">
+  <title>Branvio</title>
+  <rect width="256" height="256" rx="56" fill="#161C24"/>
+  <!-- A branch forks off the trunk and merges back: the bowl of the "b" -->
+  <path d="M96 116 A58 42 0 0 1 96 200" fill="none" stroke="#A855F7" stroke-width="22" stroke-linecap="round"/>
+  <!-- Trunk drawn on top, like a main line on a metro map: the stem of the "b" -->
+  <line x1="96" y1="52" x2="96" y2="200" stroke="#38BDF8" stroke-width="22" stroke-linecap="round"/>
+  <!-- A commit on the branch -->
+  <circle cx="154" cy="158" r="17" fill="#A855F7" stroke="#161C24" stroke-width="8"/>
+</svg>

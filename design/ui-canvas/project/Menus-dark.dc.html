@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Branvio — Command menus (dark)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible+Next:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;color-scheme:dark;background:#0F141A;color:#E6EBF0;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;font-size:14px;line-height:1.4}
+a{color:#7AA7F5}a:hover{color:#A9C6F8}
+.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid #2A333E;border-radius:8px;background:#161C24;color:#E6EBF0;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.split{border-top-right-radius:0;border-bottom-right-radius:0}
+.caret{width:28px;padding:0;justify-content:center;margin-left:-1px;border-top-left-radius:0;border-bottom-left-radius:0}
+.mono{font-family:'Atkinson Hyperlegible Mono',ui-monospace,monospace}
+.menu{box-sizing:border-box;width:300px;padding:6px;background:#161C24;border:1px solid #2A333E;border-radius:10px;box-shadow:0 10px 28px rgba(24,33,43,0.16)}
+.mi{display:flex;align-items:flex-start;gap:10px;width:100%;padding:7px 10px;border:0;border-radius:6px;background:transparent;font:inherit;font-size:13px;color:#E6EBF0;text-align:left;cursor:pointer}
+.mi:hover,.mi.on{background:#222A34}
+.mi:focus-visible{outline:2px solid #2F6FE0;outline-offset:-2px}
+.mi .ic{margin-top:1px}
+.mi small{display:block;margin-top:1px;font-size:12px;color:#9AA7B5}
+.k{margin-left:auto;padding-left:12px;font-size:12px;color:#9AA7B5;white-space:nowrap}
+.sep{height:1px;margin:6px 4px;background:#1F262F}
+.mh{margin:6px 10px 4px;font-size:12px;color:#9AA7B5}
+.danger,.danger .ic{color:#F87171}
+.cap{margin:0 0 10px;font-size:13px;font-weight:700}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1000px; box-sizing: border-box; padding: 28px 32px; background: #0F141A; display: flex; flex-direction: column; gap: 22px">
+
+  <div style="display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: #161C24; border: 1px solid #2A333E; border-radius: 10px; width: max-content">
+    <button class="btn split" type="button">Fetch</button><button class="btn caret" type="button" aria-label="More fetch options" aria-expanded="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+    <span style="width: 8px"></span>
+    <button class="btn split" type="button">Pull</button><button class="btn caret" type="button" aria-label="More pull options" aria-expanded="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+    <span style="width: 8px"></span>
+    <button class="btn split" type="button" style="background: #2F6FE0; border-color: #2F6FE0; color: #FFFFFF">Push</button><button class="btn caret" type="button" aria-label="More push options" aria-expanded="true" style="background: #2F6FE0; border-color: #2F6FE0; border-left-color: #5A8BE3; color: #FFFFFF"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+    <span style="width: 8px"></span>
+    <button class="btn" type="button" aria-expanded="true">More</button>
+    <span style="margin-left: 14px; font-size: 13px; color: #9AA7B5">The main button runs the everyday command. The arrow opens every variant.</span>
+  </div>
+
+  <div style="display: flex; gap: 20px; align-items: flex-start">
+    <section aria-label="Fetch menu">
+      <p class="cap">Fetch</p>
+      <div class="menu" role="menu" style="width: 250px">
+        <button class="mi" type="button" role="menuitem">Fetch origin<span class="k">⇧⌘F</span></button>
+        <button class="mi" type="button" role="menuitem">Fetch all remotes</button>
+        <button class="mi" type="button" role="menuitem"><span>Fetch and prune<small>Remove branches deleted on the remote</small></span></button>
+        <button class="mi" type="button" role="menuitem">Fetch tags</button>
+        <div class="sep"></div>
+        <button class="mi" type="button" role="menuitem">Fetch from another remote…</button>
+        <button class="mi" type="button" role="menuitem">Auto fetch every 10 min<span class="k">On</span></button>
+      </div>
+    </section>
+
+    <section aria-label="Pull menu">
+      <p class="cap">Pull</p>
+      <div class="menu" role="menu" style="width: 270px">
+        <button class="mi" type="button" role="menuitem"><span>Pull<small>Merge origin/feat/ai-redaction</small></span><span class="k">⇧⌘L</span></button>
+        <button class="mi" type="button" role="menuitem"><span>Pull with rebase<small>Replay your commits on top</small></span></button>
+        <button class="mi" type="button" role="menuitem"><span>Pull fast-forward only<small>Stop if a merge would be needed</small></span></button>
+        <div class="sep"></div>
+        <button class="mi" type="button" role="menuitem">Pull from another branch…</button>
+        <button class="mi" type="button" role="menuitem"><span>Stash, pull, then restore<small>For a working tree with changes</small></span></button>
+      </div>
+    </section>
+
+    <section aria-label="Push menu">
+      <p class="cap">Push</p>
+      <div class="menu" role="menu" style="width: 320px">
+        <button class="mi on" type="button" role="menuitem">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m18 9-6-6-6 6"></path><path d="M12 3v14"></path><path d="M5 21h14"></path></svg>
+          <span>Push to origin/feat/ai-redaction<small>2 commits</small></span><span class="k">⌘P</span>
+        </button>
+        <button class="mi" type="button" role="menuitem"><span style="width: 16px"></span><span>Push and set upstream…<small>For a branch not on the remote yet</small></span></button>
+        <button class="mi" type="button" role="menuitem"><span style="width: 16px"></span>Push to another remote…</button>
+        <div class="sep"></div>
+        <button class="mi" type="button" role="menuitem">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color: #FBBF24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg>
+          <span>Force push safely<small>Stops if origin changed since you last saw it</small></span>
+        </button>
+        <a class="mi danger" href="Dialogs-dark.dc.html" role="menuitem" style="text-decoration: none">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>
+          <span>Force push…<small style="color: #F87171">Overwrites the remote branch</small></span>
+        </a>
+        <div class="sep"></div>
+        <button class="mi" type="button" role="menuitem"><span style="width: 16px"></span>Push tag…</button>
+        <button class="mi" type="button" role="menuitem"><span style="width: 16px"></span>Push all tags</button>
+        <button class="mi danger" type="button" role="menuitem"><span style="width: 16px"></span>Delete feat/ai-redaction on origin…</button>
+      </div>
+    </section>
+
+    <section aria-label="More menu">
+      <p class="cap">More</p>
+      <div class="menu" role="menu" style="width: 260px">
+        <div class="mh">Work in parallel</div>
+        <button class="mi" type="button" role="menuitem">Worktrees…</button>
+        <button class="mi" type="button" role="menuitem">Submodules…</button>
+        <div class="mh">Find and repair</div>
+        <button class="mi" type="button" role="menuitem">Find a bad commit (bisect)…</button>
+        <button class="mi" type="button" role="menuitem">Recover lost work (reflog)…</button>
+        <button class="mi" type="button" role="menuitem">Clean untracked files…</button>
+        <div class="mh">Repository</div>
+        <button class="mi" type="button" role="menuitem">Remotes…</button>
+        <button class="mi" type="button" role="menuitem">Large files (LFS)…</button>
+        <button class="mi" type="button" role="menuitem">Hooks and signing…</button>
+        <button class="mi" type="button" role="menuitem">Optimize repository</button>
+      </div>
+    </section>
+  </div>
+
+  <div style="display: flex; gap: 20px; align-items: flex-start">
+    <section aria-label="Commit context menu" style="display: flex; gap: 0; align-items: flex-start">
+      <div>
+        <p class="cap">Right-click a commit</p>
+        <div class="menu" role="menu" style="width: 300px">
+          <div class="mh mono">12fb66b feat(phase5): complete…</div>
+          <button class="mi" type="button" role="menuitem">Check out this commit</button>
+          <button class="mi" type="button" role="menuitem">Create branch here…<span class="k">B</span></button>
+          <button class="mi" type="button" role="menuitem">Create tag here…<span class="k">T</span></button>
+          <div class="sep"></div>
+          <button class="mi" type="button" role="menuitem">Cherry-pick into feat/ai-redaction</button>
+          <button class="mi" type="button" role="menuitem">Revert this commit</button>
+          <button class="mi on" type="button" role="menuitem" aria-haspopup="menu" aria-expanded="true">Reset feat/ai-redaction to here<span class="k"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></span></button>
+          <button class="mi" type="button" role="menuitem">Rebase feat/ai-redaction onto here</button>
+          <button class="mi" type="button" role="menuitem">Edit history from here…</button>
+          <div class="sep"></div>
+          <button class="mi" type="button" role="menuitem">Compare with working tree</button>
+          <button class="mi" type="button" role="menuitem">Mark as good / bad for bisect</button>
+          <button class="mi" type="button" role="menuitem">Save as patch file…</button>
+          <button class="mi" type="button" role="menuitem">Copy hash<span class="k">⌘C</span></button>
+        </div>
+      </div>
+      <div class="menu" role="menu" aria-label="Reset mode" style="width: 280px; margin: 210px 0 0 -6px">
+        <button class="mi" type="button" role="menuitem"><span>Soft<small>Keep changes, staged</small></span></button>
+        <button class="mi" type="button" role="menuitem"><span>Mixed<small>Keep changes, not staged</small></span></button>
+        <button class="mi" type="button" role="menuitem"><span>Keep<small>Stop if local changes would be lost</small></span></button>
+        <a class="mi danger" href="Dialogs-dark.dc.html" role="menuitem" style="text-decoration: none"><span>Hard…<small style="color: #F87171">Discard all changes after this commit</small></span></a>
+      </div>
+    </section>
+
+    <section aria-label="Branch context menu" style="display: flex; align-items: flex-start; margin-left: 24px">
+      <div>
+        <p class="cap">Right-click a branch</p>
+        <div class="menu" role="menu" style="width: 300px">
+          <div class="mh">main</div>
+          <button class="mi" type="button" role="menuitem">Check out main</button>
+          <button class="mi on" type="button" role="menuitem" aria-haspopup="menu" aria-expanded="true">Merge main into feat/ai-redaction<span class="k"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></span></button>
+          <button class="mi" type="button" role="menuitem">Rebase feat/ai-redaction onto main</button>
+          <button class="mi" type="button" role="menuitem">Compare with feat/ai-redaction</button>
+          <div class="sep"></div>
+          <button class="mi" type="button" role="menuitem">Create pull request…</button>
+          <button class="mi" type="button" role="menuitem">Set upstream…</button>
+          <button class="mi" type="button" role="menuitem">Rename…<span class="k">F2</span></button>
+          <button class="mi danger" type="button" role="menuitem">Delete main…</button>
+        </div>
+      </div>
+      <div class="menu" role="menu" aria-label="Merge mode" style="width: 270px; margin: 66px 0 0 -6px">
+        <button class="mi" type="button" role="menuitem"><span>Merge<small>Fast-forward when possible</small></span></button>
+        <button class="mi" type="button" role="menuitem"><span>Always create a merge commit<small>--no-ff</small></span></button>
+        <button class="mi" type="button" role="menuitem"><span>Squash into one commit<small>Changes land staged, you commit</small></span></button>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

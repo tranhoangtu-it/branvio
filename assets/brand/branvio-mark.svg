@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="64 32 128 192" width="128" height="192" role="img" aria-label="Branvio">
+  <title>Branvio mark (for light backgrounds)</title>
+  <path d="M96 116 A58 42 0 0 1 96 200" fill="none" stroke="#7C3AED" stroke-width="22" stroke-linecap="round"/>
+  <line x1="96" y1="52" x2="96" y2="200" stroke="#0284C7" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="154" cy="158" r="17" fill="#7C3AED" stroke="#FFFFFF" stroke-width="8"/>
+</svg>

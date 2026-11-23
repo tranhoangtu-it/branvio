@@ -1,0 +1,29 @@
+[package]
+name = "diff-merge"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "High-performance diffing (imara-diff), AST syntax highlighting (tree-sitter), line-level patch synthesis, and 4-buffer ropey 3-way merge engine"
+
+[lints]
+workspace = true
+
+[dependencies]
+compact_str.workspace = true
+imara-diff.workspace = true
+branvio-core.workspace = true
+ropey.workspace = true
+serde.workspace = true
+smallvec.workspace = true
+thiserror.workspace = true
+tree-sitter.workspace = true
+tree-sitter-json.workspace = true
+tree-sitter-python.workspace = true
+tree-sitter-rust.workspace = true
+tree-sitter-typescript.workspace = true
+
+[dev-dependencies]
+git-engine.workspace = true
+tempfile.workspace = true
+tokio.workspace = true

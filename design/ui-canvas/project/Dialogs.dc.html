@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Branvio — Confirm dialogs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible+Next:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F6F8;color:#18212B;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;font-size:14px;line-height:1.4}
+a{color:#1F5FD1}a:hover{color:#174AA6}
+.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid #DCE2E8;border-radius:8px;background:#FFFFFF;color:#18212B;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #1F5FD1;outline-offset:2px}
+.mono{font-family:'Atkinson Hyperlegible Mono',ui-monospace,monospace}
+.dlg{box-sizing:border-box;flex:1 1 0;min-width:0;display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #DCE2E8;border-radius:12px;box-shadow:0 16px 40px rgba(24,33,43,0.16)}
+.dlg h2{margin:0;font-size:17px;font-weight:700;line-height:1.3}
+.body{padding:20px;display:flex;flex-direction:column;gap:14px;flex:1}
+.foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid #EEF1F4}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid #DCE2E8;border-radius:8px;font-size:13px;cursor:pointer}
+.opt input{margin-top:3px;accent-color:#1F5FD1}
+.opt small{display:block;color:#566373;font-size:12px}
+.sel{border-color:#1F5FD1;background:#F2F7FE}
+.cm{display:grid;grid-template-columns:70px minmax(0,1fr);gap:8px;padding:7px 10px;font-size:13px;border-bottom:1px solid #EEF1F4}
+.p{color:#566373;font-size:13px;margin:0}
+.rb{display:grid;grid-template-columns:20px 108px 66px minmax(0,1fr);gap:10px;align-items:center;padding:6px 10px;border:1px solid #DCE2E8;border-radius:8px;font-size:13px;background:#FFFFFF}
+.rb select{height:30px;border:1px solid #C5CED8;border-radius:6px;background:#FFFFFF;color:#18212B;font:inherit;font-size:13px;padding:0 6px}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 40px 32px; display: flex; gap: 24px; align-items: flex-start; background: #E9EDF1">
+
+  <section class="dlg" role="dialog" aria-labelledby="fp-title">
+    <div class="body">
+      <div style="display: flex; gap: 12px; align-items: flex-start">
+        <span style="flex: none; width: 36px; height: 36px; border-radius: 18px; background: #FBEAEA; color: #B8322E; display: grid; place-items: center"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg></span>
+        <div>
+          <h2 id="fp-title">Force push feat/ai-redaction?</h2>
+          <p class="p" style="margin-top: 4px">origin has 2 commits that are not on your branch. Pushing removes them from origin.</p>
+        </div>
+      </div>
+      <div style="border: 1px solid #DCE2E8; border-radius: 8px; overflow: hidden">
+        <div style="padding: 7px 10px; font-size: 12px; color: #566373; background: #FAFBFC; border-bottom: 1px solid #EEF1F4">Will be removed from origin</div>
+        <div class="cm"><span class="mono" style="color: #B8322E">9e41c07</span><span>fix(ai-copilot): retry on 429</span></div>
+        <div class="cm" style="border-bottom: 0"><span class="mono" style="color: #B8322E">5b2ad18</span><span>docs: provider setup notes</span></div>
+      </div>
+      <label class="opt sel"><input type="radio" name="fp" checked><span>Force push safely <small>Stops if origin changed after you opened this dialog. Recommended.</small></span></label>
+      <label class="opt"><input type="radio" name="fp"><span>Force push <small>Always overwrite origin/feat/ai-redaction.</small></span></label>
+    </div>
+    <div class="foot">
+      <button class="btn" type="button">Cancel</button>
+      <button class="btn" type="button" style="background: #B8322E; border-color: #B8322E; color: #FFFFFF">Force push safely</button>
+    </div>
+  </section>
+
+  <section class="dlg" role="dialog" aria-labelledby="rs-title">
+    <div class="body">
+      <div>
+        <h2 id="rs-title">Reset feat/ai-redaction to 12fb66b</h2>
+        <p class="p" style="margin-top: 4px">2 commits after 12fb66b will leave this branch. Choose what happens to their changes.</p>
+      </div>
+      <label class="opt"><input type="radio" name="rs"><span>Soft <small>Keep the changes, staged and ready to commit again.</small></span></label>
+      <label class="opt"><input type="radio" name="rs"><span>Mixed <small>Keep the changes in your working tree, not staged.</small></span></label>
+      <label class="opt"><input type="radio" name="rs"><span>Keep <small>Like hard, but stops if it would overwrite your uncommitted work.</small></span></label>
+      <label class="opt sel" style="border-color: #B8322E; background: #FDF4F4"><input type="radio" name="rs" checked style="accent-color: #B8322E"><span style="color: #B8322E">Hard <small style="color: #8E2B27">Discard the 2 commits and 3 files with uncommitted changes.</small></span></label>
+      <p class="p" style="display: flex; gap: 8px; align-items: flex-start">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="margin-top: 2px"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"></path></svg>
+        You can undo this with Undo or from Recover lost work.
+      </p>
+    </div>
+    <div class="foot">
+      <button class="btn" type="button">Cancel</button>
+      <button class="btn" type="button" style="background: #B8322E; border-color: #B8322E; color: #FFFFFF">Reset and discard</button>
+    </div>
+  </section>
+
+  <section class="dlg" role="dialog" aria-labelledby="ir-title" style="flex: 1.25 1 0">
+    <div class="body">
+      <div>
+        <h2 id="ir-title">Edit history of feat/ai-redaction</h2>
+        <p class="p" style="margin-top: 4px">Drag to reorder. Commits run from oldest at the top to newest at the bottom.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <div class="rb">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color: #8A96A3"><circle cx="9" cy="6" r="1"></circle><circle cx="15" cy="6" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="9" cy="18" r="1"></circle><circle cx="15" cy="18" r="1"></circle></svg>
+          <select aria-label="Action for 7d3f5b1"><option>Keep</option><option>Reword</option><option>Edit</option><option>Squash</option><option>Fixup</option><option>Drop</option></select>
+          <span class="mono">7d3f5b1</span><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">test(ai-copilot): add secret pattern fixtures</span>
+        </div>
+        <div class="rb" style="border-color: #C9A6F4; background: #FAF6FF">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color: #8A96A3"><circle cx="9" cy="6" r="1"></circle><circle cx="15" cy="6" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="9" cy="18" r="1"></circle><circle cx="15" cy="18" r="1"></circle></svg>
+          <select aria-label="Action for 3c08e9a"><option>Keep</option><option>Reword</option><option>Edit</option><option selected>Squash</option><option>Fixup</option><option>Drop</option></select>
+          <span class="mono">3c08e9a</span><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">wip: more fixtures</span>
+        </div>
+        <div class="rb">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color: #8A96A3"><circle cx="9" cy="6" r="1"></circle><circle cx="15" cy="6" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="9" cy="18" r="1"></circle><circle cx="15" cy="18" r="1"></circle></svg>
+          <select aria-label="Action for a1c9e02"><option>Keep</option><option selected>Reword</option><option>Edit</option><option>Squash</option><option>Fixup</option><option>Drop</option></select>
+          <span class="mono">a1c9e02</span><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">feat(ai-copilot): mask secrets before sending diffs</span>
+        </div>
+        <div class="rb" style="opacity: 0.6">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color: #8A96A3"><circle cx="9" cy="6" r="1"></circle><circle cx="15" cy="6" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="9" cy="18" r="1"></circle><circle cx="15" cy="18" r="1"></circle></svg>
+          <select aria-label="Action for f20b7d4"><option>Keep</option><option>Reword</option><option>Edit</option><option>Squash</option><option>Fixup</option><option selected>Drop</option></select>
+          <span class="mono">f20b7d4</span><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration: line-through">debug: print prompt</span>
+        </div>
+      </div>
+      <div style="padding: 10px 12px; border-radius: 8px; background: #F7F9FB; font-size: 13px">
+        <strong style="font-weight: 700">Result:</strong> 3 commits. wip: more fixtures joins the commit above it, and you will reword a1c9e02.
+      </div>
+      <label style="display: flex; gap: 8px; align-items: center; font-size: 13px"><input type="checkbox" checked style="accent-color: #1F5FD1">Stash my uncommitted changes first</label>
+    </div>
+    <div class="foot">
+      <button class="btn" type="button">Cancel</button>
+      <button class="btn" type="button" style="background: #1F5FD1; border-color: #1F5FD1; color: #FFFFFF">Start rebase</button>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

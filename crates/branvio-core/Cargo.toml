@@ -1,0 +1,23 @@
+[package]
+name = "branvio-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "UI-agnostic core domain types, compact identifiers, cross-platform paths/SSH environment hydration, and lock-free MVCC reactive pipeline for Branvio"
+
+[lints]
+workspace = true
+
+[dependencies]
+arc-swap.workspace = true
+bitflags.workspace = true
+bstr.workspace = true
+compact_str.workspace = true
+dunce.workspace = true
+parking_lot.workspace = true
+serde.workspace = true
+smallvec.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true

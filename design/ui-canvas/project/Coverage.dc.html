@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Branvio — Git command coverage</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500&amp;family=Atkinson+Hyperlegible+Next:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F6F8;color:#18212B;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;font-size:14px;line-height:1.4}
+a{color:#1F5FD1}a:hover{color:#174AA6}
+.mono{font-family:'Atkinson Hyperlegible Mono',ui-monospace,monospace}
+.card{box-sizing:border-box;background:#FFFFFF;border:1px solid #DCE2E8;border-radius:12px;padding:14px 16px;overflow:hidden}
+.card h2{margin:0 0 8px;font-size:15px;font-weight:700;display:flex;justify-content:space-between;align-items:baseline}
+.card h2 span{font-size:12px;font-weight:400;color:#566373}
+.r{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:4px 0;border-top:1px solid #EEF1F4;font-size:12.5px;line-height:1.35}
+.r .mono{color:#3E4A57}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 24px 32px; display: flex; flex-direction: column; gap: 14px; background: #F4F6F8">
+  <div style="display: flex; align-items: baseline; gap: 16px">
+    <h1 style="margin: 0; font-size: 20px; font-weight: 700">Where each git command lives</h1>
+    <p style="margin: 0; font-size: 13px; color: #566373">Left: the git command. Right: where you run it in Branvio. Anything not listed runs from ⌘K by typing <span class="mono">&gt;</span> and the raw command.</p>
+  </div>
+
+  <div style="flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+    <section class="card">
+      <h2>Start <span>5 commands</span></h2>
+      <div class="r"><span class="mono">init</span><span>Welcome › New repository</span></div>
+      <div class="r"><span class="mono">clone</span><span>Welcome › Clone</span></div>
+      <div class="r"><span class="mono">config user.name / email</span><span>Settings › Identity</span></div>
+      <div class="r"><span class="mono">remote add / rename / remove</span><span>More › Remotes</span></div>
+      <div class="r"><span class="mono">config (any key)</span><span>Settings › Git config</span></div>
+
+      <h2 style="margin-top: 14px">Changes <span>10 commands</span></h2>
+      <div class="r"><span class="mono">status</span><span>Commit screen, file lists</span></div>
+      <div class="r"><span class="mono">add, add -p</span><span>Stage file, Stage lines</span></div>
+      <div class="r"><span class="mono">restore</span><span>Discard file, Discard lines</span></div>
+      <div class="r"><span class="mono">rm, mv</span><span>Right-click file › Delete, Rename</span></div>
+      <div class="r"><span class="mono">commit</span><span>Commit panel</span></div>
+      <div class="r"><span class="mono">commit --amend</span><span>Amend last commit</span></div>
+      <div class="r"><span class="mono">commit -S, --no-verify</span><span>Commit panel › Options</span></div>
+      <div class="r"><span class="mono">stash push -u</span><span>Toolbar › Stash</span></div>
+      <div class="r"><span class="mono">stash apply / pop / drop</span><span>Sidebar › Stashes</span></div>
+      <div class="r"><span class="mono">stash branch</span><span>Right-click stash</span></div>
+    </section>
+
+    <section class="card">
+      <h2>Branches and history <span>13 commands</span></h2>
+      <div class="r"><span class="mono">branch, switch -c</span><span>Toolbar › Branch, Create branch here</span></div>
+      <div class="r"><span class="mono">switch, checkout</span><span>Double-click a branch or commit</span></div>
+      <div class="r"><span class="mono">branch -m / -d / -D</span><span>Right-click branch › Rename, Delete</span></div>
+      <div class="r"><span class="mono">merge, --no-ff, --squash</span><span>Right-click branch › Merge ›</span></div>
+      <div class="r"><span class="mono">merge --abort</span><span>Merge banner › Abort merge</span></div>
+      <div class="r"><span class="mono">rebase</span><span>Rebase onto here, drag branch</span></div>
+      <div class="r"><span class="mono">rebase -i</span><span>Edit history from here</span></div>
+      <div class="r"><span class="mono">rebase --continue / --skip / --abort</span><span>Rebase banner</span></div>
+      <div class="r"><span class="mono">cherry-pick</span><span>Commit menu, drag commit to branch</span></div>
+      <div class="r"><span class="mono">revert</span><span>Commit menu › Revert</span></div>
+      <div class="r"><span class="mono">reset --soft / --mixed / --keep / --hard</span><span>Commit menu › Reset ›</span></div>
+      <div class="r"><span class="mono">tag, tag -a, tag -d</span><span>Create tag here, Sidebar › Tags</span></div>
+      <div class="r"><span class="mono">notes</span><span>Commit details › Notes</span></div>
+
+      <h2 style="margin-top: 14px">Sync <span>8 commands</span></h2>
+      <div class="r"><span class="mono">fetch, --all, --prune, --tags</span><span>Fetch ▾</span></div>
+      <div class="r"><span class="mono">pull, --rebase, --ff-only</span><span>Pull ▾</span></div>
+      <div class="r"><span class="mono">push, push -u</span><span>Push ▾</span></div>
+      <div class="r"><span class="mono">push --force-with-lease</span><span>Push ▾ › Force push safely</span></div>
+      <div class="r"><span class="mono">push --force</span><span>Push ▾ › Force push</span></div>
+      <div class="r"><span class="mono">push --tags, push origin v1</span><span>Push ▾ › Push tag</span></div>
+      <div class="r"><span class="mono">push --delete</span><span>Push ▾ › Delete on remote</span></div>
+      <div class="r"><span class="mono">pull request</span><span>Right-click branch › Create pull request</span></div>
+    </section>
+
+    <section class="card">
+      <h2>Inspect <span>8 commands</span></h2>
+      <div class="r"><span class="mono">log (any filter)</span><span>History, search bar</span></div>
+      <div class="r"><span class="mono">show</span><span>Commit details panel</span></div>
+      <div class="r"><span class="mono">diff (tree, staged, commits)</span><span>Diff view, Compare</span></div>
+      <div class="r"><span class="mono">blame</span><span>Right-click file › Blame</span></div>
+      <div class="r"><span class="mono">log -S, log -G</span><span>Search › In code changes</span></div>
+      <div class="r"><span class="mono">reflog</span><span>More › Recover lost work</span></div>
+      <div class="r"><span class="mono">bisect start / good / bad / reset</span><span>More › Find a bad commit</span></div>
+      <div class="r"><span class="mono">shortlog</span><span>Search › Filter by author</span></div>
+
+      <h2 style="margin-top: 14px">Advanced <span>9 commands</span></h2>
+      <div class="r"><span class="mono">worktree add / list / remove</span><span>More › Worktrees</span></div>
+      <div class="r"><span class="mono">submodule add / update / sync</span><span>More › Submodules</span></div>
+      <div class="r"><span class="mono">clean -n, clean -fd</span><span>More › Clean untracked files</span></div>
+      <div class="r"><span class="mono">gc, maintenance</span><span>More › Optimize repository</span></div>
+      <div class="r"><span class="mono">lfs track / pull</span><span>More › Large files</span></div>
+      <div class="r"><span class="mono">sparse-checkout</span><span>More › Worktrees › Sparse</span></div>
+      <div class="r"><span class="mono">format-patch, am, apply</span><span>Save as patch file, Apply patch</span></div>
+      <div class="r"><span class="mono">archive</span><span>Commit menu › Export as zip</span></div>
+      <div class="r"><span class="mono">hooks, gpg / ssh signing</span><span>More › Hooks and signing</span></div>
+      <div class="r" style="border-top: 1px solid #DCE2E8; margin-top: 6px; padding-top: 8px"><span class="mono">anything else</span><span>⌘K, then <span class="mono">&gt;</span> and the command</span></div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

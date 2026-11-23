@@ -1,0 +1,118 @@
+name: Release Cross-Platform Installers
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+# Least privilege. The job only builds and uploads workflow artifacts; if it later publishes
+# a GitHub Release, grant `contents: write` on that job only.
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Build & Package (${{ matrix.platform }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-universal
+            runner: macos-latest
+          - platform: windows-x64
+            runner: windows-latest
+          - platform: linux-x64
+            runner: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+        with:
+          toolchain: stable
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+
+      - name: Install Linux packaging & GPUI dependencies
+        if: matrix.platform == 'linux-x64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxkbcommon-x11-dev libxkbcommon-dev \
+            libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
+            libwayland-dev libvulkan-dev libfontconfig1-dev \
+            libdbus-1-dev libsecret-1-dev pkg-config cmake rpm desktop-file-utils
+
+      - name: Build release binary (macOS)
+        if: matrix.platform == 'macos-universal'
+        run: cargo build --release -p app-ui
+
+      - name: Package macOS .app & .dmg
+        if: matrix.platform == 'macos-universal'
+        run: |
+          chmod +x packaging/macos/build_dmg.sh
+          packaging/macos/build_dmg.sh target/release/app-ui dist
+
+      - name: Build release binary (Windows)
+        if: matrix.platform == 'windows-x64'
+        run: cargo build --release -p app-ui
+
+      - name: Stage Windows portable & MSI/NSIS assets
+        if: matrix.platform == 'windows-x64'
+        shell: pwsh
+        # Untrusted values (tag / branch names) reach the script only through the environment,
+        # never through `${{ }}` interpolation into the script body.
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Only accept version-shaped refs (e.g. v1.2.3, 1.2.3-rc.1); anything else (e.g. a
+          # branch name on workflow_dispatch) falls back to a fixed development version.
+          if ($env:REF_NAME -match '^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$') {
+            $Version = $env:REF_NAME -replace '^v', ''
+          } else {
+            Write-Host "Ref '$env:REF_NAME' is not a version; using 0.0.0-dev"
+            $Version = '0.0.0-dev'
+          }
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item target/release/app-ui.exe dist/branvio.exe
+          # License texts + third-party attributions ship alongside the portable binary. The
+          # MSI/NSIS installers read the same files from the repository root (paths relative to
+          # packaging/windows), so both installers are built from that directory.
+          Copy-Item LICENSE-MIT, LICENSE-APACHE, THIRD_PARTY_NOTICES.md, THIRD_PARTY_LICENSES.md dist/
+          Push-Location packaging/windows
+          try {
+            if (Get-Command wix -ErrorAction SilentlyContinue) {
+              wix build branvio.wxs -ext WixToolset.UI.wixext -o ..\..\dist\branvio-x64.msi
+              if ($LASTEXITCODE -ne 0) { throw "wix build failed ($LASTEXITCODE)" }
+            }
+            if (Get-Command makensis -ErrorAction SilentlyContinue) {
+              makensis "/DVERSION=$Version" "/DOUTFILE=..\..\dist\branvio-setup-x64.exe" installer.nsi
+              if ($LASTEXITCODE -ne 0) { throw "makensis failed ($LASTEXITCODE)" }
+            }
+          } finally {
+            Pop-Location
+          }
+
+      - name: Build release binary & packages (.deb/.rpm/.AppImage) (Linux)
+        if: matrix.platform == 'linux-x64'
+        run: |
+          cargo build --release -p app-ui
+          chmod +x packaging/linux/build_linux_packages.sh
+          packaging/linux/build_linux_packages.sh target/release/app-ui dist
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: branvio-${{ matrix.platform }}
+          path: dist/*

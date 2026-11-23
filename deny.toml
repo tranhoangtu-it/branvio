@@ -1,0 +1,103 @@
+# cargo-deny configuration — run `cargo deny check` (CI: .github/workflows/ci.yml).
+# Docs: https://embarkstudios.github.io/cargo-deny/
+#
+# Policy: the app is distributed as `MIT OR Apache-2.0` binaries. Only permissive licenses
+# are allowed by default; anything copyleft must be added as a reviewed per-crate exception.
+
+[graph]
+all-features = false
+no-default-features = false
+
+[output]
+feature-depth = 1
+
+# ---------------------------------------------------------------------------
+# Security advisories (RustSec)
+# ---------------------------------------------------------------------------
+[advisories]
+version = 2
+db-urls = ["https://github.com/rustsec/advisory-db"]
+yanked = "deny"
+# Add entries as { id = "RUSTSEC-YYYY-NNNN", reason = "..." } only after review.
+ignore = []
+
+# ---------------------------------------------------------------------------
+# Licenses
+# ---------------------------------------------------------------------------
+[licenses]
+version = 2
+confidence-threshold = 0.9
+allow = [
+    "MIT",
+    "MIT-0",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "0BSD",
+    "BSL-1.0",
+    "CC0-1.0",
+    "Unlicense",
+    "Unicode-3.0",
+    "NCSA",
+    "CDLA-Permissive-2.0",
+]
+
+# Reviewed copyleft exceptions. MPL-2.0 is file-level copyleft: using these crates
+# unmodified in a MIT/Apache binary is fine as long as THIRD_PARTY_NOTICES.md says where
+# their source is available; modified MPL files must be published under MPL-2.0.
+exceptions = [
+    { crate = "nucleo", allow = ["MPL-2.0"] },          # command-palette fuzzy matcher (direct dep)
+    { crate = "nucleo-matcher", allow = ["MPL-2.0"] },  # direct dep
+    { crate = "dwrote", allow = ["MPL-2.0"] },          # Windows DirectWrite bindings (via gpui)
+    { crate = "uluru", allow = ["MPL-2.0"] },           # LRU cache (via gpui text stack)
+    { crate = "option-ext", allow = ["MPL-2.0"] },      # via dirs-sys
+    { crate = "cbindgen", allow = ["MPL-2.0"] },        # build-time only, not linked
+]
+
+# libgit2 (bundled C sources inside `libgit2-sys`) is GPL-2.0 WITH the libgit2 linking
+# exception, which explicitly permits linking into differently licensed programs. The crate's
+# own manifest declares `MIT OR Apache-2.0`, so cargo-deny sees only that; this note exists so
+# nobody "fixes" a future change to the manifest by denying the crate. If its manifest ever
+# starts declaring the GPL + linking exception (there is no SPDX id for libgit2's exception;
+# expect something like `GPL-2.0-only WITH LicenseRef-libgit2-linking-exception`), add a
+# `{ crate = "libgit2-sys", allow = [...] }` entry to `exceptions` after re-reading
+# https://github.com/libgit2/libgit2/blob/main/COPYING.
+
+[licenses.private]
+# `ignore = true` skips license checks only for *unpublishable* crates (`publish = false` or
+# restricted to private registries). The workspace crates do not set `publish = false` today,
+# so this currently has no effect and their `MIT OR Apache-2.0` manifests are checked like any
+# other crate (which passes). Kept so that marking crates `publish = false` later needs no change.
+ignore = true
+
+# ---------------------------------------------------------------------------
+# Bans
+# ---------------------------------------------------------------------------
+[bans]
+multiple-versions = "warn"
+# `version = "*"` dependencies are an unpinnable supply-chain surface.
+# TODO(supply-chain): flip to "deny". It is "warn" only because the internal workspace
+# dependencies are path-only (`branvio-core = { path = ... }`, no `version`), which cargo-deny
+# reports as wildcards. `allow-wildcard-paths` below exempts path dependencies only for crates
+# that are not publishable, and no workspace crate sets `publish = false` yet. Fix either by
+# adding `version = "0.1.0"` to each internal path dependency, or by adding `publish = false`
+# to every workspace crate.
+wildcards = "warn"
+allow-wildcard-paths = true
+highlight = "all"
+deny = [
+    # OpenSSL is intentionally not used (rustls / OS TLS); keep it that way.
+    { crate = "openssl-sys", reason = "use rustls; avoids system OpenSSL linkage" },
+]
+
+# ---------------------------------------------------------------------------
+# Sources: only crates.io; no git dependencies or alternate registries unless reviewed.
+# ---------------------------------------------------------------------------
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

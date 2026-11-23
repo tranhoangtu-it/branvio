@@ -1,0 +1,46 @@
+[package]
+name = "app-ui"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "UI-agnostic Presenter ports + PURE_RUST_GPUI native shell and internal Git CLI helper binary entrypoint"
+
+[lints]
+workspace = true
+
+[features]
+default = ["gpui-backend"]
+gpui-backend = ["dep:gpui", "dep:wgpu"]
+headless = []
+
+[dependencies]
+ai-copilot.workspace = true
+anyhow.workspace = true
+compact_str.workspace = true
+diff-merge.workspace = true
+forge-client.workspace = true
+fs-watcher.workspace = true
+git-engine.workspace = true
+gpui = { workspace = true, optional = true }
+graph-layout.workspace = true
+branvio-core.workspace = true
+nucleo.workspace = true
+nucleo-matcher.workspace = true
+oplog-undo.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+terminal-pty.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+wgpu = { workspace = true, optional = true }
+
+[dev-dependencies]
+tempfile.workspace = true
+
+# Only resolved/downloaded/run when the *target* is Windows (build-dependency cfg follows the
+# target platform), so macOS/Linux builds never fetch or execute it.
+[target.'cfg(windows)'.build-dependencies]
+winresource.workspace = true

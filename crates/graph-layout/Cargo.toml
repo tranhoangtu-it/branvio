@@ -1,0 +1,17 @@
+[package]
+name = "graph-layout"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Metro-line DAG Commit Graph layout engine, lane allocator, deterministic branch color hashing, and instant viewport filtering"
+
+[lints]
+workspace = true
+
+[dependencies]
+compact_str.workspace = true
+branvio-core.workspace = true
+serde.workspace = true
+smallvec.workspace = true
+thiserror.workspace = true
