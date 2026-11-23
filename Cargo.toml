@@ -12,6 +12,12 @@ members = [
     "crates/ai-copilot",
     "crates/app-ui",
 ]
+# Vendored third-party crates are not workspace members (see vendor/*/BRANVIO-PATCH.md).
+exclude = ["vendor"]
+
+# xattr 0.2.3 fails to build on Linux with libc >= 0.2.190; see vendor/xattr-0.2.3/BRANVIO-PATCH.md.
+[patch.crates-io]
+xattr = { path = "vendor/xattr-0.2.3" }
 
 [workspace.package]
 version = "0.1.0"
@@ -119,7 +125,9 @@ futures = "0.3.34"
 async-trait = "0.1.92"
 
 # Lock-free / compact data structures & OS path normalization
-parking_lot = "0.13.0"
+# Same major as gpui/tokio. parking_lot 0.13 needs libc >= 0.2.191, which dropped `libc::ENOATTR`
+# that xattr 0.2 (pulled in by gpui on Linux) still uses.
+parking_lot = "0.12.5"
 crossbeam-channel = "0.5.17"
 arc-swap = "1.9.5"
 dashmap = "6.2.1"

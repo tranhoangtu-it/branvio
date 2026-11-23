@@ -19,6 +19,7 @@ use portable_pty::{
 };
 use std::collections::HashSet;
 use std::io::{Read, Write};
+#[cfg(unix)]
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};

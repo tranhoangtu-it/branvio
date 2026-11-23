@@ -2,11 +2,14 @@
 
 use branvio_core::paths::HostPath;
 use branvio_core::platform::HydratedGitEnv;
+#[cfg(unix)]
 use compact_str::CompactString;
 use std::sync::Arc;
 use std::time::Duration;
 use tempfile::TempDir;
-use terminal_pty::{PortablePtyBackend, PtySize, ShellProfile, TerminalBackend};
+#[cfg(unix)]
+use terminal_pty::ShellProfile;
+use terminal_pty::{PortablePtyBackend, PtySize, TerminalBackend};
 
 #[tokio::test]
 async fn spawns_real_pty_executes_command_renders_ansi_colors_resizes_and_closes() {

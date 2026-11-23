@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
+#[cfg(unix)]
 use std::time::Duration;
+#[cfg(unix)]
 use tokio::process::Command;
 
 /// Detected SSH authentication agent backing Git network and signing operations.

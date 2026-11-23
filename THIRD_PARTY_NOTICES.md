@@ -44,9 +44,9 @@ Portions of this software are copyright © 1996-2023 The FreeType Project (www.f
   `Apache-2.0 OR GPL-2.0-only`, `MIT OR Apache-2.0 OR LGPL-2.1-or-later`) are used under
   their permissive option.
 
-## Rust crates linked into the `app-ui` binary (799)
+## Rust crates linked into the `app-ui` binary (795)
 
-### MIT OR Apache-2.0 (433)
+### MIT OR Apache-2.0 (430)
 
 | Crate | Version | Repository |
 |---|---|---|
@@ -257,7 +257,6 @@ Portions of this software are copyright © 1996-2023 The FreeType Project (www.f
 | libgit2-sys | 0.18.8+1.9.7 | <https://github.com/rust-lang/git2-rs> |
 | libz-sys | 1.1.33 | <https://github.com/rust-lang/libz-sys> |
 | lock_api | 0.4.14 | <https://github.com/Amanieu/parking_lot> |
-| lock_api | 0.5.0 | <https://github.com/Amanieu/parking_lot> |
 | log | 0.4.35 | <https://github.com/rust-lang/log> |
 | lyon | 1.0.19 | <https://github.com/nical/lyon> |
 | lyon_algorithms | 1.0.22 | <https://github.com/nical/lyon> |
@@ -290,8 +289,6 @@ Portions of this software are copyright © 1996-2023 The FreeType Project (www.f
 | openssl-probe | 0.2.2 | <https://github.com/rustls/openssl-probe> |
 | ordered-stream | 0.2.0 | <https://github.com/danieldg/ordered-stream> |
 | parking_lot | 0.12.5 | <https://github.com/Amanieu/parking_lot> |
-| parking_lot | 0.13.0 | <https://github.com/Amanieu/parking_lot> |
-| parking_lot_core | 0.10.0 | <https://github.com/Amanieu/parking_lot> |
 | parking_lot_core | 0.9.12 | <https://github.com/Amanieu/parking_lot> |
 | pathfinder_geometry | 0.5.1 | <https://github.com/servo/pathfinder> |
 | pathfinder_simd | 0.5.6 | <https://github.com/servo/pathfinder> |
@@ -484,7 +481,7 @@ Portions of this software are copyright © 1996-2023 The FreeType Project (www.f
 | zed-font-kit | 0.14.1-zed | <https://github.com/servo/font-kit> |
 | zed-reqwest | 0.12.15-zed | <https://github.com/seanmonstar/reqwest> |
 
-### MIT (153)
+### MIT (152)
 
 | Crate | Version | Repository |
 |---|---|---|
@@ -567,7 +564,6 @@ Portions of this software are copyright © 1996-2023 The FreeType Project (www.f
 | prodash | 31.0.1 | <https://github.com/GitoxideLabs/prodash> |
 | redox_syscall | 0.2.16 | <https://gitlab.redox-os.org/redox-os/syscall> |
 | redox_syscall | 0.5.18 | <https://gitlab.redox-os.org/redox-os/syscall> |
-| redox_syscall | 0.9.5 | <https://gitlab.redox-os.org/redox-os/kernel> |
 | redox_users | 0.4.6 | <https://gitlab.redox-os.org/redox-os/users> |
 | rgb | 0.8.53 | <https://github.com/kornelski/rust-rgb> |
 | ropey | 1.6.1 | <https://github.com/cessen/ropey> |
