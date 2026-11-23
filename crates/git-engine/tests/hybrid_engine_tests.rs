@@ -2,9 +2,10 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
+#[cfg(unix)]
+use branvio_core::domain::FileMode;
 use branvio_core::domain::{
-    CommitFlags, CommitSignatureState, ConflictSubkind, DeltaStatus, FileMode, RefKind,
-    UNRESOLVED_COMMIT_ROW,
+    CommitFlags, CommitSignatureState, ConflictSubkind, DeltaStatus, RefKind, UNRESOLVED_COMMIT_ROW,
 };
 use branvio_core::ids::GitOid;
 use branvio_core::paths::{HostPath, RepoRelPath};
@@ -21,6 +22,7 @@ use std::io::Write;
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::sync::Arc;
+#[cfg(unix)]
 use std::time::Duration;
 use tempfile::TempDir;
 
@@ -1028,12 +1030,11 @@ async fn tier1_reads_conflict_stages_tier3_discards_paths_and_detects_exec_bit()
     run_git(dir.path(), &["add", "."], &[]);
     run_git(dir.path(), &["commit", "-m", "base"], &[]);
 
-    let cancel = CancelToken::new();
-
     // Verify chmod +x executable bit detection on Unix (`new_mode == Executable755`).
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
+        let cancel = CancelToken::new();
         let mut perms = std::fs::metadata(&script_path).unwrap().permissions();
         perms.set_mode(0o755);
         std::fs::set_permissions(&script_path, perms).unwrap();
