@@ -19,6 +19,16 @@
 
 > **Status: pre-alpha.** The core engine is implemented across a modular Rust workspace, but Branvio has not had a public release yet. Expect rough edges and breaking changes.
 
+<p align="center">
+  <img src="assets/quickstart-demo.svg" alt="Branvio Quickstart Preview" width="820">
+</p>
+
+## Quick Start
+
+```sh
+git clone https://github.com/tranhoangtu-it/branvio.git && cd branvio && cargo run -p app-ui --release
+```
+
 ## Highlights
 
 - **Metro-map commit graph.** Branches are drawn as metro lines with stable colors, so `main`, release and feature lines are recognizable at a glance, even in large repositories.

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="320" viewBox="0 0 820 320" role="img" aria-label="Branvio Quickstart Preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="820" height="320" rx="14" fill="url(#bg)"/>
+  <rect x="20" y="20" width="780" height="280" rx="10" fill="#0b1120" stroke="#334155" stroke-width="1.5"/>
+  <circle cx="44" cy="44" r="6" fill="#ef4444"/>
+  <circle cx="64" cy="44" r="6" fill="#f59e0b"/>
+  <circle cx="84" cy="44" r="6" fill="#22c55e"/>
+  <text x="112" y="49" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">branvio — Native Rust Desktop Git Client (GPUI + oplog-undo)</text>
+  <text x="42" y="92" fill="#38bdf8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">$ git clone https://github.com/tranhoangtu-it/branvio.git &amp;&amp; cd branvio &amp;&amp; cargo run -p app-ui --release</text>
+  <text x="42" y="132" fill="#22c55e" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">[graph]   * c9a41f2 (main)     feat(stage): line-level hunk picker (tree-sitter + imara-diff)</text>
+  <text x="42" y="158" fill="#a78bfa" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">[graph]   | * 7e3b09d (feat)   fix(conflict): 3-way resolver + safety prompt guard</text>
+  <text x="42" y="184" fill="#cbd5e1" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">[oplog]   Snapshot #42 saved before rebase (working tree + untracked preserved)</text>
+  <rect x="42" y="210" width="230" height="62" rx="8" fill="#172554" stroke="#1d4ed8"/>
+  <text x="58" y="236" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600">Metro Commit Graph</text>
+  <text x="58" y="256" fill="#93c5fd" font-family="ui-monospace, monospace" font-size="12">GPU-accelerated panes</text>
+  <rect x="292" y="210" width="230" height="62" rx="8" fill="#052e16" stroke="#15803d"/>
+  <text x="308" y="236" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600">Safe Undo &amp; Leases</text>
+  <text x="308" y="256" fill="#86efac" font-family="ui-monospace, monospace" font-size="12">oplog-undo snapshots</text>
+  <rect x="542" y="210" width="230" height="62" rx="8" fill="#2e1065" stroke="#7e22ce"/>
+  <text x="558" y="236" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600">AI Commit &amp; Conflicts</text>
+  <text x="558" y="256" fill="#d8b4fe" font-family="ui-monospace, monospace" font-size="12">Ollama / OpenAI / Gemini</text>
+</svg>
